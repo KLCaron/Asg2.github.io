@@ -7,12 +7,24 @@
 }
 
 .tooltip {
-    position: absolute;
+    position: fixed;
     z-index: 999;
     background-color: gray;
     color: white;
     padding: 5px;
     border-radius: 5px;
+    display: none;
+}
+
+.snackbar {
+    position: fixed;
+    bottom: 20px;
+    z-index: 999;
+    background-color: gray;
+    color: white;
+    padding: 16px;
+    border-radius: 5px;
+    min-width: 250px;
     display: none;
 }
 
@@ -26,6 +38,11 @@ header {
     margin-left: auto;
 }
 
+.sectionHeader {
+    display: flex;
+    justify-content: center;
+}
+
 #searchResults {
     width: 75%;
     float: right;
@@ -34,6 +51,33 @@ header {
 #searchOptions {
     width: 25%;
     float: left;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    
+}
+
+.filterContainer {
+    display: flex;
+    align-items: center;
+}
+
+.label {
+    width: 80px;
+}
+
+.filterInput {
+    flex: 0.9;
+}
+
+.searchButtonContainer {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.searchButtons {
+    width: 35%;
 }
 
 .songs {
@@ -41,9 +85,13 @@ header {
     padding: 0;
 }
 
+.filterInput {
+    width: calc(80% - 120px);
+}
+
 .songs .headerRow, .songs .songItem {
     display: grid;
-    grid-template-columns: 35% 20% repeat(3, 15%);
+    grid-template-columns: 5% 30% 20% repeat(3, 15%);
     gap: 5px;
 }
 
@@ -55,4 +103,11 @@ header {
 .songs .songItem span {
     padding: 5px;
     text-align: left;
+}
+
+/* recheck this once we implement api */
+#songList {
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }

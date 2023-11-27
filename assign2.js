@@ -41,7 +41,35 @@ document.addEventListener('DOMContentLoaded', () => {
    });
 });
 
+function setSongSearch() {
+   const titleRadio = document.querySelector('#titleRadio');
+   const titleFilter = document.querySelector('#titleFilter');
+   const artistRadio = document.querySelector('#artistRadio');
+   const artistFilter = document.querySelector('#artistFilter');
+   const genreRadio = document.querySelector('#genreRadio');
+   const genreFilter = document.querySelector('#genreFilter');
+   titleRadio.checked = true;
+   titleFilter.disabled = false;
+   artistFilter.disabled = true;
+   genreFilter.disabled = true;
+   
 
+   titleRadio.addEventListener('click', () => {
+      artistFilter.disabled = true;
+      genreFilter.disabled = true;
+      titleFilter.disabled = false;
+   });
+   artistRadio.addEventListener('click', () => {
+      titleFilter.disabled = true;
+      genreFilter.disabled = true;
+      artistFilter.disabled = false;
+   });
+   genreRadio.addEventListener('click', () => {
+      artistFilter.disabled = true;
+      titleFilter.disabled = true;
+      genreFilter.disabled = false;
+   });
+}
 
 //switch views here
 function showView(view) {
@@ -55,6 +83,7 @@ function showView(view) {
 
    if (view == searchView) {
       showSearchView();
+      setSongSearch();
    }
 }
 
@@ -117,6 +146,9 @@ function displaySongList(songs, songList) {
    const headerRow = document.createElement('li');
    headerRow.classList.add('headerRow');
 
+   const playlistPlaceholder = document.createElement('span');
+   headerRow.appendChild(playlistPlaceholder);
+
    const headerTitles = ['Title', 'Artist', 'Year', 'Genre', 'Popularity'];
    headerTitles.forEach(title => {
       const headerItem = document.createElement('span');
@@ -141,6 +173,13 @@ function arraySongs(songs, songList) {
    songs.forEach(song => {
       const listItem = document.createElement('li');
       listItem.classList.add('songItem');
+
+      const playlist = document.createElement('button');
+      playlist.classList.add('selectable');
+      playlist.textContent = 'Add';
+      playlist.addEventListener('click', () => {
+         addToPlaylist(song);
+      })
 
       const title = document.createElement('span');
       title.classList.add('selectable');
@@ -172,6 +211,7 @@ function arraySongs(songs, songList) {
       const popularity = document.createElement('span');
       popularity.textContent = song.details.popularity;
 
+      listItem.appendChild(playlist);
       listItem.appendChild(title);
       listItem.appendChild(artist);
       listItem.appendChild(year);
@@ -205,19 +245,54 @@ function sortSongs(songs, event, songList) {
          break;
    }
 
-   const sortedSongs = direction === 0 ? songs.sort(sortingFunction) : songs.sort((a, b) => sortingFunction(b, a));
+   const sortedSongs = direction == 0 ? songs.sort(sortingFunction) : songs.sort((a, b) => sortingFunction(b, a));
 
-   event.target.setAttribute('dataDirection', direction === 0 ? 1 : 0);
+   event.target.setAttribute('dataDirection', direction == 0 ? 1 : 0);
    populateSearchView(songList);
 }
 
+//creates a tooltip at the mouse, dynamically positoned based on where in the screen the mouse is
 function tooltipDisplay(event, content) {
    const tooltip = document.querySelector('.tooltip');
    tooltip.innerHTML = content;
+   
+   const windowWidth = window.innerWidth;
+   const windowHeight = window.innerHeight;
+
+   tooltip.style.display = 'block';
+   const tooltipWidth = tooltip.offsetWidth;
+   const tooltipHeight = tooltip.offsetHeight;
+   tooltip.style.display = 'none';
+
+   let tooltipX = event.pageX;
+   let tooltipY = event.pageY;
+
+   if (tooltipX > windowWidth / 2) {
+      tooltipX -= tooltipWidth;
+   }
+
+   if (tooltipY > windowHeight / 2) {
+      tooltipY -= tooltipHeight;
+   }
+
+   tooltip.style.left = tooltipX + 'px';
+   tooltip.style.top = tooltipY + 'px';
    tooltip.style.display = 'inline-block';
-   tooltip.style.left = event.pageX + 'px';
-   tooltip.style.top = event.pageY + 'px';
+
    setTimeout(() => {
       tooltip.style.display = 'none';
    }, 5000);
+}
+
+function showSnackbar(song) {
+   const snackbar = document.querySelector('.snackbar');
+   snackbar.style.display = 'block';
+   snackbar.innerHTML = song.title + " by " + song.artist.name + " added to playlist.";
+   setTimeout(() => {
+      snackbar.style.display = 'none';
+   }, 5000);
+}
+
+function addToPlaylist(song) {
+   showSnackbar(song);
 }

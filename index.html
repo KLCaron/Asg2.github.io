@@ -21,16 +21,36 @@
 
     <main id="mainContent">
         <div class="tooltip"></div>
+        <div class="snackbar"></div>
         <section id="homeView" class="view">
 
         </section>
         <section id="searchView" class="view">
             <div id="searchResults">
-                <h2 class="header">Search Results</h2>
+                <h2 class="sectionHeader">Search Results</h2>
                 <ul id="songList" class="songs"></ul>
             </div>
             <div id="searchOptions">
-                <h2>Song Search</h2>
+                <h2 class="sectionHeader">Song Search</h2>
+                <div class="filterContainer">
+                    <input type="radio" name="filter" value="title" id="titleRadio" checked>
+                    <label for="titleRadio" class="label">Title:</label>
+                    <input type="text" id="titleFilter" class="filterInput" placeholder="Enter title...">
+                </div>
+                <div class="filterContainer">
+                    <input type="radio" name="filter" value="artist" id="artistRadio">
+                    <label for="artistRadio" class="label">Artist:</label>
+                    <input type="text" id="artistFilter" class="filterInput" placeholder="Enter artist...">
+                </div>
+                <div class="filterContainer">
+                    <input type="radio" name="filter" value="genre" id="genreRadio">
+                    <label for="genreRadio" class="label">Genre:</label>
+                    <input type="text" id="genreFilter" class="filterInput" placeholder="Enter genre...">
+                </div>
+                <div class="searchButtonContainer">
+                    <button id="clearFilter" class="selectable searchButtons">Clear</button>
+                    <button id="filterBtn" class="selectable searchButtons">Filter</button>
+                </div>                
             </div>
         </section>
         <section id="singleSongView" class="view">
