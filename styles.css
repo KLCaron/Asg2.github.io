@@ -1,0 +1,58 @@
+.selectable {
+    cursor: pointer;
+}
+
+.selectable:hover {
+    text-decoration: underline;
+}
+
+.tooltip {
+    position: absolute;
+    z-index: 999;
+    background-color: gray;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    display: none;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-buttons {
+    margin-left: auto;
+}
+
+#searchResults {
+    width: 75%;
+    float: right;
+}
+
+#searchOptions {
+    width: 25%;
+    float: left;
+}
+
+.songs {
+    list-style-type: none;
+    padding: 0;
+}
+
+.songs .headerRow, .songs .songItem {
+    display: grid;
+    grid-template-columns: 35% 20% repeat(3, 15%);
+    gap: 5px;
+}
+
+.songs .headerRow span {
+    padding: 5px;
+    text-align: center;
+}
+
+.songs .songItem span {
+    padding: 5px;
+    text-align: left;
+}
