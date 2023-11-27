@@ -166,9 +166,9 @@ function displaySongList(songs, songList) {
    const headerTitles = ['Title', 'Artist', 'Year', 'Genre', 'Popularity'];
    headerTitles.forEach(title => {
       const headerItem = document.createElement('span');
-      headerItem.textContent = title;
       headerItem.classList.add('sortable');
       headerItem.classList.add('selectable');
+      headerItem.innerHTML = `${title}<span class="sortIndicator"></span>`;
       headerItem.setAttribute('dataDirection', 0);
       headerRow.appendChild(headerItem);
       headerItem.addEventListener('click', (event) => {
@@ -260,6 +260,7 @@ function sortSongs(songs, event, songList) {
    }
 
    const sortedSongs = direction == 0 ? songs.sort(sortingFunction) : songs.sort((a, b) => sortingFunction(b, a));
+   updateSortIndicator(event.target);
 
    event.target.setAttribute('dataDirection', direction == 0 ? 1 : 0);
    populateSearchView(songs, songList);
@@ -332,3 +333,19 @@ function filterSongs(inputValue, songs, songList, selectedFilter) {
 function clearSongsFilter(songs, songList) {
    populateSearchView(songs, displaySongList(songs, songList));
 }
+
+function updateSortIndicator(target) {
+   const sortIndicator = parseInt(target.getAttribute('dataDirection'));
+
+   target.classList.remove('up', 'down');
+
+   if (sortIndicator == 0) {
+      target.classList.add('up');
+   } else {
+      target.classList.add('down');
+   }
+   console.log(target.classList);
+}
+//make new js docs at the end lmao
+/******************************************************************************************************************************************/
+
