@@ -4,8 +4,6 @@ const api = 'https://www.randyconnolly.com/funwebdev/3rd/api/music/songs-nested.
    Some possibilities: if using Visual Code, use Live Server extension; if Brackets,
    use built-in Live Preview.
 */
-let currentSortField = 'title';
-let currentSortDirection = 'asc';
 
 document.addEventListener('DOMContentLoaded', () => {
    //get references to my various elements
@@ -17,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
    const searchView = document.querySelector('#searchView');
    const singleSongView = document.querySelector('#singleSongView');
    const logo = document.querySelector('#logo');
-   const creditsPopup = document.querySelector('#creditsPopup');
 
    showView(homeView);
 
@@ -63,7 +60,13 @@ function showView(view) {
 
 function showSearchView() {
    retrieveStorage();
-   displaySongList(songs);
+   songs.sort((a, b) => a.title.localeCompare(b.title));
+   const songList = document.querySelector('#songList');
+   populateSearchView(displaySongList(songs, songList));
+}
+
+function populateSearchView(songList) {
+   arraySongs(songs, songList);
 }
 
 //fetch and store song data from our jsons
@@ -108,9 +111,7 @@ function retrieveStorage() {
    }
 }
 
-function displaySongList(songs) {
-   const songList = document.querySelector('#songList');
-   songs.sort((a, b) => a.title.localeCompare(b.title));
+function displaySongList(songs, songList) {
    songList.innerHTML = '';
 
    const headerRow = document.createElement('li');
@@ -122,10 +123,20 @@ function displaySongList(songs) {
       headerItem.textContent = title;
       headerItem.classList.add('sortable');
       headerItem.classList.add('selectable');
+      headerItem.setAttribute('dataDirection', 0);
       headerRow.appendChild(headerItem);
+      headerItem.addEventListener('click', (event) => {
+         sortSongs(songs, event, songList);
+      });
    });
 
    songList.appendChild(headerRow);
+   return songList;
+}
+
+function arraySongs(songs, songList) {
+   const existingSongItems = songList.querySelectorAll('.songItem');
+   existingSongItems.forEach(item => item.remove());
 
    songs.forEach(song => {
       const listItem = document.createElement('li');
@@ -169,6 +180,35 @@ function displaySongList(songs) {
 
       songList.appendChild(listItem);
    });
+}
+
+function sortSongs(songs, event, songList) {
+   const column = event.target.textContent;
+   const direction = parseInt(event.target.getAttribute('dataDirection'));
+   let sortingFunction;
+
+   switch (column) {
+      case 'Popularity':
+         sortingFunction = (a, b) => a.details.popularity - b.details.popularity;
+         break;
+      case 'Genre':
+         sortingFunction = (a, b) => a.genre.name.localeCompare(b.genre.name);
+         break;
+      case 'Year':
+         sortingFunction = (a, b) => a.year - b.year;
+         break;
+      case 'Artist':
+         sortingFunction = (a, b) => a.artist.name.localeCompare(b.artist.name);
+         break;
+      default:
+         sortingFunction = (a, b) => a.title.localeCompare(b.title);
+         break;
+   }
+
+   const sortedSongs = direction === 0 ? songs.sort(sortingFunction) : songs.sort((a, b) => sortingFunction(b, a));
+
+   event.target.setAttribute('dataDirection', direction === 0 ? 1 : 0);
+   populateSearchView(songList);
 }
 
 function tooltipDisplay(event, content) {
