@@ -7,9 +7,9 @@ const api = 'https://www.randyconnolly.com/funwebdev/3rd/api/music/songs-nested.
 
 document.addEventListener('DOMContentLoaded', () => {
    //get references to my various elements
-   const searchBtn = document.querySelector('#searchBtn');
-   const playlistBtn = document.querySelector('#playlistBtn');
-   const creditsBtn = document.querySelector('#creditsBtn');
+   const searchButton = document.querySelector('#searchButton');
+   const playlistButton = document.querySelector('#playlistButton');
+   const creditsButton = document.querySelector('#creditsButton');
    const mainContent = document.querySelector('#mainContent');
    const homeView = document.querySelector('#homeView');
    const searchView = document.querySelector('#searchView');
@@ -27,15 +27,15 @@ document.addEventListener('DOMContentLoaded', () => {
       showView(homeView);
    });
 
-   searchBtn.addEventListener('click', () => {
+   searchButton.addEventListener('click', () => {
       showView(searchView);
    });
 
-   playlistBtn.addEventListener('click', () => {
+   playlistButton.addEventListener('click', () => {
       //implement playlist view
    });
 
-   creditsBtn.addEventListener('mouseover', (event) => {
+   creditsButton.addEventListener('mouseover', (event) => {
       const creditsContent = '<p>Group Members: Kellen Caron</p><a href="https://github.com/">GitHub</a>'; //replace github link here for final handin
       tooltipDisplay(event, creditsContent);
    });
@@ -88,13 +88,27 @@ function showView(view) {
 }
 
 function showSearchView() {
+   const filterButton = document.querySelector('#filterButton');
+   const clearButton = document.querySelector('#clearButton')
+
    retrieveStorage();
    songs.sort((a, b) => a.title.localeCompare(b.title));
    const songList = document.querySelector('#songList');
-   populateSearchView(displaySongList(songs, songList));
+   populateSearchView(songs, displaySongList(songs, songList));
+
+   filterButton.addEventListener('click', () => {
+      const selectedFilter = document.querySelector(`input[name="filter"]:checked`).value;
+      const filterInput = document.querySelector(`#${selectedFilter}Filter`);
+      const inputValue = filterInput.value.trim();
+      filterSongs(inputValue, songs, songList, selectedFilter);
+   });
+
+   clearButton.addEventListener('click', () => {
+      clearSongsFilter(songs, songList);
+   });
 }
 
-function populateSearchView(songList) {
+function populateSearchView(songs, songList) {
    arraySongs(songs, songList);
 }
 
@@ -248,7 +262,7 @@ function sortSongs(songs, event, songList) {
    const sortedSongs = direction == 0 ? songs.sort(sortingFunction) : songs.sort((a, b) => sortingFunction(b, a));
 
    event.target.setAttribute('dataDirection', direction == 0 ? 1 : 0);
-   populateSearchView(songList);
+   populateSearchView(songs, songList);
 }
 
 //creates a tooltip at the mouse, dynamically positoned based on where in the screen the mouse is
@@ -295,4 +309,26 @@ function showSnackbar(song) {
 
 function addToPlaylist(song) {
    showSnackbar(song);
+}
+
+function filterSongs(inputValue, songs, songList, selectedFilter) {
+   const filteredSongs = songs.filter(song => {
+      let filterValue = '';
+
+      if (selectedFilter == 'title') {
+         filterValue = song[selectedFilter].toString().toLowerCase();
+      } else if (selectedFilter == 'artist') {
+         filterValue = song.artist.name.toString().toLowerCase();
+      } else {
+         filterValue = song.genre.name.toString().toLowerCase();
+      }
+
+      return filterValue.includes(inputValue.toLowerCase());
+   });
+
+   populateSearchView(filteredSongs, displaySongList(filteredSongs, songList));
+}
+
+function clearSongsFilter(songs, songList) {
+   populateSearchView(songs, displaySongList(songs, songList));
 }
