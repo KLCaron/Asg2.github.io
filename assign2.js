@@ -12,10 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
    const creditsButton = document.querySelector('#creditsButton');
    const homeView = document.querySelector('#homeView');
    const searchView = document.querySelector('#searchView');
-   const playlistView = document.querySelector('#playlistView');
    const logo = document.querySelector('#logo');
 
-   showView(homeView);
+   showView(homeView, false);
 
    //fetch data from API to populate Home view on page load
    window.addEventListener('load', () => {
@@ -23,15 +22,15 @@ document.addEventListener('DOMContentLoaded', () => {
    });
 
    logo.addEventListener('click', () => {
-      showView(homeView);
+      showView(homeView, false);
    });
 
    searchButton.addEventListener('click', () => {
-      showView(searchView);
+      showView(searchView, false);
    });
 
    playlistButton.addEventListener('click', () => {
-      showView(playlistView);
+      showView(searchView, true);
    });
 
    creditsButton.addEventListener('mouseover', (event) => {
@@ -71,7 +70,7 @@ function setSongSearch() {
 }
 
 //switch views here
-function showView(view) {
+function showView(view, redirect) {
    //hide all views
    const views = document.querySelectorAll('.view');
    views.forEach(view => {
@@ -81,38 +80,44 @@ function showView(view) {
    view.style.display = 'block';
 
    if (view == searchView) {
-      showSearchView();
+      showSearchView(redirect);
       setSongSearch();
    } else if (view == homeView) {
-
-   } else if (view == playlistView) {
-
+      view.style.display = 'none';
+   } else if (redirect) {
+      showSearchView(redirect);
+      setSongSearch();
    }
 }
 
-function showSearchView() {
+function showSearchView(redirect) {
    const filterButton = document.querySelector('#filterButton');
    const clearButton = document.querySelector('#clearButton')
 
    retrieveStorage();
-   songs.sort((a, b) => a.title.localeCompare(b.title));
+
+   let mySongs;
+
+   if (redirect) {
+      mySongs = setPlaylistSongs(songs);
+   } else {
+      mySongs = songs;
+   }
+
+   mySongs.sort((a, b) => a.title.localeCompare(b.title));
    const songList = document.querySelector('#songList');
-   populateSearchView(songs, displaySongList(songs, songList));
+   arraySongs(mySongs, displaySongList(mySongs, songList));
 
    filterButton.addEventListener('click', () => {
       const selectedFilter = document.querySelector(`input[name="filter"]:checked`).value;
       const filterInput = document.querySelector(`#${selectedFilter}Filter`);
       const inputValue = filterInput.value.trim();
-      filterSongs(inputValue, songs, songList, selectedFilter);
+      filterSongs(inputValue, mySongs, songList, selectedFilter);
    });
 
    clearButton.addEventListener('click', () => {
-      clearSongsFilter(songs, songList);
+      clearSongsFilter(mySongs, songList);
    });
-}
-
-function populateSearchView(songs, songList) {
-   arraySongs(songs, songList);
 }
 
 //fetch and store song data from our jsons
@@ -193,10 +198,19 @@ function arraySongs(songs, songList) {
 
       const playlist = document.createElement('button');
       playlist.classList.add('selectable');
-      playlist.textContent = 'Add';
-      playlist.addEventListener('click', () => {
-         addToPlaylist(song);
-      })
+      if (song.onPlaylist) {
+         playlist.textContent = 'Remove';
+         playlist.addEventListener('click', () => {
+            removeFromPlaylist(song);
+            arraySongs(songs, songList);
+         });
+      } else {
+         playlist.textContent = 'Add';
+         playlist.addEventListener('click', () => {
+            addToPlaylist(song);
+            arraySongs(songs, songList);
+         });
+      }
 
       const title = document.createElement('span');
       title.classList.add('selectable');
@@ -266,7 +280,7 @@ function sortSongs(songs, event, songList) {
    updateSortIndicator(event.target);
 
    event.target.setAttribute('dataDirection', direction == 0 ? 1 : 0);
-   populateSearchView(songs, songList);
+   arraySongs(songs, songList);
 }
 
 //creates a tooltip at the mouse, dynamically positoned based on where in the screen the mouse is
@@ -305,15 +319,18 @@ function tooltipDisplay(event, content) {
 function showSnackbar(song) {
    const snackbar = document.querySelector('.snackbar');
    snackbar.style.display = 'block';
-   snackbar.innerHTML = song.title + " by " + song.artist.name + " added to playlist.";
+   if (song.onPlaylist) {
+      snackbar.innerHTML = song.title + " by " + song.artist.name + " removed from playlist.";
+   } else {
+      snackbar.innerHTML = song.title + " by " + song.artist.name + " added to playlist.";
+   }
+   
    setTimeout(() => {
       snackbar.style.display = 'none';
    }, 5000);
 }
 
-function addToPlaylist(song) {
-   showSnackbar(song);
-}
+
 
 function filterSongs(inputValue, songs, songList, selectedFilter) {
    const filteredSongs = songs.filter(song => {
@@ -330,11 +347,11 @@ function filterSongs(inputValue, songs, songList, selectedFilter) {
       return filterValue.includes(inputValue.toLowerCase());
    });
 
-   populateSearchView(filteredSongs, displaySongList(filteredSongs, songList));
+   arraySongs(filteredSongs, displaySongList(filteredSongs, songList));
 }
 
 function clearSongsFilter(songs, songList) {
-   populateSearchView(songs, displaySongList(songs, songList));
+   arraySongs(songs, displaySongList(songs, songList));
 }
 
 function updateSortIndicator(target) {
@@ -349,6 +366,7 @@ function updateSortIndicator(target) {
    }
    console.log(target.classList);
 }
+
 //make new js docs at the end lmao
 /******************************************************************************************************************************************/
 
@@ -484,3 +502,34 @@ function createRadarChart(song) {
       options: chartOptions
    });
 }
+
+//make new js docs at the end lmao
+/******************************************************************************************************************************************/
+
+function addToPlaylist(song) {
+   showSnackbar(song);
+   song.onPlaylist = true;
+
+   localStorage.setItem('songs', JSON.stringify(songs));
+}
+
+function removeFromPlaylist(song) {
+   showSnackbar(song);
+   song.onPlaylist = false;
+
+   localStorage.setItem('songs', JSON.stringify(songs));
+}
+
+function setPlaylistSongs(songs) {
+   let playlistSongs = [];
+   songs.forEach (song => {
+      if (song.onPlaylist) {
+         playlistSongs.push(song);
+      }
+   });
+
+   return playlistSongs;
+}
+
+//still need to finish playlist - need a way to clear playlist, and then summary information about the playlist, like average popularity, or number of songs
+//in list
