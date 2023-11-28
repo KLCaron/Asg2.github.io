@@ -10,10 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
    const searchButton = document.querySelector('#searchButton');
    const playlistButton = document.querySelector('#playlistButton');
    const creditsButton = document.querySelector('#creditsButton');
-   const mainContent = document.querySelector('#mainContent');
    const homeView = document.querySelector('#homeView');
    const searchView = document.querySelector('#searchView');
-   const singleSongView = document.querySelector('#singleSongView');
+   const playlistView = document.querySelector('#playlistView');
    const logo = document.querySelector('#logo');
 
    showView(homeView);
@@ -32,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
    });
 
    playlistButton.addEventListener('click', () => {
-      //implement playlist view
+      showView(playlistView);
    });
 
    creditsButton.addEventListener('mouseover', (event) => {
@@ -84,6 +83,10 @@ function showView(view) {
    if (view == searchView) {
       showSearchView();
       setSongSearch();
+   } else if (view == homeView) {
+
+   } else if (view == playlistView) {
+
    }
 }
 
@@ -200,7 +203,7 @@ function arraySongs(songs, songList) {
       title.textContent = song.title.length > 25 ? song.title.slice(0, 24) : song.title;
       
       title.addEventListener('click', () => {
-         showView(singleSongView);
+         showSingleSongView(song);
       });
 
       if (song.title.length > 25) {
@@ -349,3 +352,135 @@ function updateSortIndicator(target) {
 //make new js docs at the end lmao
 /******************************************************************************************************************************************/
 
+function showSingleSongView(song) {
+   const views = document.querySelectorAll('.view');
+   views.forEach(view => {
+      view.style.display = 'none';
+   });
+   const view = document.querySelector('#singleSongView');
+   view.style.display = 'block';
+
+   const radarChartCanvas = document.querySelector('#radarChart');
+
+   const oldchart = Chart.getChart(radarChartCanvas);
+
+   if (oldchart) {
+      oldchart.destroy();
+   }
+
+   const songInformation = document.querySelector('#songInformation');
+   songInformation.innerHTML = '';
+
+   const radarChartContainer = document.querySelector('#chart');
+   const formattedDuration = formatDuration(song.details.duration);
+   const artistType = getArtistType(song.artist.name)
+   const songDetailsHTML = `
+   <h2>${song.title}</h2>
+   <p>Artist: ${song.artist.name}</p>
+   <p>Artist Type: ${artistType}</p>
+   <p>Genre: ${song.genre.name}</p>
+   <p>Year: ${song.year}</p>
+   <p>Duration: ${formattedDuration}</p>`;
+   const analysisData = `
+   <h3>Analysis Data: </h3>
+   <ul>
+   <li>BPM: ${song.details.bpm}</li>
+   <li>Energy: ${song.analytics.energy}</li>
+   <li>Danceability: ${song.analytics.danceability}</li>
+   <li>Liveness: ${song.analytics.liveness}</li>
+   <li>Valence: ${song.analytics.valence}</li>
+   <li>Acousticness: ${song.analytics.acousticness}</li>
+   <li>Speechiness: ${song.analytics.speechiness}</li>
+   <li>Popularity: ${song.details.popularity}</li>
+   </ul>`;
+
+   songInformation.innerHTML = songDetailsHTML + analysisData;
+   radarChartContainer.appendChild(radarChartCanvas);
+
+   createRadarChart(song);
+}
+
+function formatDuration(durationSeconds) {
+   const minutes = Math.floor(durationSeconds / 60);
+   let seconds = durationSeconds % 60;
+   if (seconds < 10) {
+      seconds = '0' + seconds;
+   };
+
+   return `${minutes}:${seconds}`;
+}
+
+function getArtistType(name) {
+   const type = artists.find(artist => artist.name == name);
+   return type ? type.type : 'Unknown';
+}
+
+function createRadarChart(song) {
+   const radarChartCanvas = document.querySelector('#radarChart');
+
+   const chartData = {
+      label: false,
+      labels: ['Energy', 'Danceability', 'Valence', 'Liveness', 'Acousticness', 
+         'Speechiness'],
+      datasets: [{
+         labels: ['Energy', 'Danceability', 'Valence', 'Liveness', 'Acousticness', 
+         'Speechiness'],
+         data: [song.analytics.energy, song.analytics.danceability, 
+         song.analytics.valence, song.analytics.liveness, song.analytics.acousticness, 
+         song.analytics.speechiness],
+         borderColor: 'black',
+         borderWidth: 1
+      }]
+   };
+
+   const chartOptions = {
+      maintainAspectRatio: false,
+      aspectRatio: 0.5,
+      scale: {
+         ticks: {
+            beginAtZero: true,
+            min: 0,
+            max: 100,
+            stepSize: 20,
+            font: {
+               weight: 'bold',
+               size: 14,
+            },
+         },
+      },
+      scales: {
+         r: {
+            ticks: {
+               callback: function(value, index, ticks) {
+                  return value + '%';
+               },
+            },
+            pointLabels: {
+               font: {
+                  weight: 'bold',
+                  size: 20,
+               },
+            },
+         },
+      },
+      plugins: {
+         legend: {
+            display: false
+         },
+         tooltip: {
+            callbacks: {
+               label: function (tooltipItem) {
+                  const yLabel = tooltipItem.formattedValue;
+                  return yLabel + '%';
+               },
+            },
+         },
+      },
+   };
+
+   return new Chart(radarChartCanvas, {
+      type: 'radar',
+      data: chartData,
+      options: chartOptions
+   });
+}

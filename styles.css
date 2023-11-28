@@ -43,18 +43,17 @@ header {
     justify-content: center;
 }
 
-#searchResults {
+#searchResults, #chart {
     width: 75%;
     float: right;
 }
 
-#searchOptions {
+#searchOptions, #songInformation {
     width: 25%;
     float: left;
     display: flex;
     flex-direction: column;
     gap: 25px;
-    
 }
 
 .filterContainer {
@@ -126,4 +125,26 @@ li.headerRow > span.sortable.down > .sortIndicator {
 
 li.headerRow > span.sortable.up > .sortIndicator {
     border-top: 4px solid green;
+}
+
+#songInformation {
+    text-align: left;
+    position: relative;
+    left: 5%;
+}
+
+#songInformation h2 {
+    margin: 0 0;
+}
+
+#songInformation h3 {
+    margin: 0 0 -3%;
+}
+
+#songInformation p {
+    margin: -1% 0;
+}
+
+#songInformation ul {
+    padding-left: 1em;
 }
