@@ -3,10 +3,12 @@
 
 :root {
     --color-white: rgba(255,255,255); 
+    --color-white-200: rgba(251,255,254,0.15);
+
     --color-aqua-bg : rgb(44,162,163);
     --color-blue-bg: rgba(63,94,251);
-    --color-puprle-bg: rgba(49,20,59,1);
-    --color-white-200: rgba(251,255,254,0.15);
+    --color-dark-pink: #ff4d9a;
+    
 }
 
 html {
@@ -96,10 +98,11 @@ header h1:hover {
 /* Main content */
 /* home page styles */
 #homeView {
-    display: inline-block;
+    display: flex;
     justify-content: center;
     gap: 20px; 
-    padding: 20px;/
+    padding: 10px;
+    flex-wrap: wrap;
 }
 
 .homeContainer {
@@ -108,9 +111,8 @@ header h1:hover {
     padding: 20px;
     border-radius: 8px;
     margin: 20px;
-
     text-align: center;
-    
+    min-width: 300px;
 }
 
 .sectionHeader {
@@ -118,6 +120,13 @@ header h1:hover {
     justify-content: center;
 }
 
+#homeView li {
+    padding: 3px;
+}
+
+#homeView li:hover {
+    color: var(--color-blue-bg);
+}
 
 #searchResults, #chart {
     width: 70%;
