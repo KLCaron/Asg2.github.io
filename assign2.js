@@ -251,7 +251,7 @@ function arraySongs(songs, songList, redirect) {
          const ellipsis = document.createElement('span');
          ellipsis.classList.add('ellipsis');
          ellipsis.innerHTML = '&hellip;';
-         ellipsis.addEventListener('click', (event) => {
+         ellipsis.addEventListener('mouseover', (event) => {
             tooltipDisplay(event, song.title);
          });
          title.appendChild(ellipsis);

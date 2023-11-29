@@ -133,15 +133,20 @@ header h1:hover {
     color: var(--color-dark-blue)
 }
 
-#searchResults, #chart {
+#searchResults {
     width: 70%;
-    float: left;
+    float: right;
+}
+
+#chart {
+    width: 60%;
+    float: right;
 }
 
 #searchOptions, #songInformation {
     width: 25%;
-    float: left;
     display: flex;
+    float: left;
     flex-direction: column;
     gap: 25px;
 }
