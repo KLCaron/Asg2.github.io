@@ -92,7 +92,8 @@ function showView(view, redirect) {
 
 function showSearchView(redirect) {
    const filterButton = document.querySelector('#filterButton');
-   const clearButton = document.querySelector('#clearButton')
+   const clearButton = document.querySelector('#clearButton');
+   const clearPlaylistButton = document.querySelector('#clearPlaylistButton');
 
    retrieveStorage();
 
@@ -100,23 +101,30 @@ function showSearchView(redirect) {
 
    if (redirect) {
       mySongs = setPlaylistSongs(songs);
+      clearPlaylistButton.style.display = 'block';
+      clearPlaylistButton.addEventListener('click', () => {
+         clearPlaylist();
+         showSearchView(redirect);
+         showSnackbar();
+      });
    } else {
       mySongs = songs;
+      clearPlaylistButton.style.display = 'none';
    }
 
    mySongs.sort((a, b) => a.title.localeCompare(b.title));
    const songList = document.querySelector('#songList');
-   arraySongs(mySongs, displaySongList(mySongs, songList));
+   arraySongs(mySongs, displaySongList(mySongs, songList), redirect);
 
    filterButton.addEventListener('click', () => {
       const selectedFilter = document.querySelector(`input[name="filter"]:checked`).value;
       const filterInput = document.querySelector(`#${selectedFilter}Filter`);
       const inputValue = filterInput.value.trim();
-      filterSongs(inputValue, mySongs, songList, selectedFilter);
+      filterSongs(inputValue, mySongs, songList, selectedFilter, redirect);
    });
 
    clearButton.addEventListener('click', () => {
-      clearSongsFilter(mySongs, songList);
+      clearSongsFilter(mySongs, songList, redirect);
    });
 }
 
@@ -188,7 +196,7 @@ function displaySongList(songs, songList) {
    return songList;
 }
 
-function arraySongs(songs, songList) {
+function arraySongs(songs, songList, redirect) {
    const existingSongItems = songList.querySelectorAll('.songItem');
    existingSongItems.forEach(item => item.remove());
 
@@ -202,13 +210,13 @@ function arraySongs(songs, songList) {
          playlist.textContent = 'Remove';
          playlist.addEventListener('click', () => {
             removeFromPlaylist(song);
-            arraySongs(songs, songList);
+            showSearchView(redirect);
          });
       } else {
          playlist.textContent = 'Add';
          playlist.addEventListener('click', () => {
             addToPlaylist(song);
-            arraySongs(songs, songList);
+            showSearchView(redirect);
          });
       }
 
@@ -280,7 +288,7 @@ function sortSongs(songs, event, songList) {
    updateSortIndicator(event.target);
 
    event.target.setAttribute('dataDirection', direction == 0 ? 1 : 0);
-   arraySongs(songs, songList);
+   arraySongs(songs, songList, redirect);
 }
 
 //creates a tooltip at the mouse, dynamically positoned based on where in the screen the mouse is
@@ -318,21 +326,32 @@ function tooltipDisplay(event, content) {
 
 function showSnackbar(song) {
    const snackbar = document.querySelector('.snackbar');
-   snackbar.style.display = 'block';
-   if (song.onPlaylist) {
+   snackbar.innerHTML = '';
+   
+   if (!song) {
+      snackbar.innerHTML = "All songs removed from playlist.";
+   } else if (!song.onPlaylist) {
       snackbar.innerHTML = song.title + " by " + song.artist.name + " removed from playlist.";
    } else {
       snackbar.innerHTML = song.title + " by " + song.artist.name + " added to playlist.";
    }
-   
-   setTimeout(() => {
-      snackbar.style.display = 'none';
+
+   const oldTimeout = snackbar.getAttribute('timeoutId');
+   if (oldTimeout) {
+      clearTimeout(oldTimeout);
+   }
+
+   snackbar.style.opacity = 1;
+   const timeoutId = setTimeout(() => {
+      snackbar.style.opacity = 0;
    }, 5000);
+
+   snackbar.setAttribute('timeoutId', timeoutId);
 }
 
 
 
-function filterSongs(inputValue, songs, songList, selectedFilter) {
+function filterSongs(inputValue, songs, songList, selectedFilter, redirect) {
    const filteredSongs = songs.filter(song => {
       let filterValue = '';
 
@@ -347,11 +366,11 @@ function filterSongs(inputValue, songs, songList, selectedFilter) {
       return filterValue.includes(inputValue.toLowerCase());
    });
 
-   arraySongs(filteredSongs, displaySongList(filteredSongs, songList));
+   arraySongs(filteredSongs, displaySongList(filteredSongs, songList), redirect);
 }
 
-function clearSongsFilter(songs, songList) {
-   arraySongs(songs, displaySongList(songs, songList));
+function clearSongsFilter(songs, songList, redirect) {
+   arraySongs(songs, displaySongList(songs, songList), redirect);
 }
 
 function updateSortIndicator(target) {
@@ -506,18 +525,16 @@ function createRadarChart(song) {
 //make new js docs at the end lmao
 /******************************************************************************************************************************************/
 
-function addToPlaylist(song) {
-   showSnackbar(song);
+function addToPlaylist(song) { 
    song.onPlaylist = true;
-
    localStorage.setItem('songs', JSON.stringify(songs));
+   showSnackbar(song);
 }
 
 function removeFromPlaylist(song) {
-   showSnackbar(song);
    song.onPlaylist = false;
-
    localStorage.setItem('songs', JSON.stringify(songs));
+   showSnackbar(song);
 }
 
 function setPlaylistSongs(songs) {
@@ -529,6 +546,14 @@ function setPlaylistSongs(songs) {
    });
 
    return playlistSongs;
+}
+
+function clearPlaylist() {
+   songs.forEach (song => {
+      song.onPlaylist = false;
+   });
+
+   localStorage.setItem('songs', JSON.stringify(songs));
 }
 
 //still need to finish playlist - need a way to clear playlist, and then summary information about the playlist, like average popularity, or number of songs
