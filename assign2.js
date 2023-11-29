@@ -7,37 +7,33 @@ document.addEventListener('DOMContentLoaded', () => {
    const searchView = document.querySelector('#searchView');
    const logo = document.querySelector('#logo');
 
-   initialize();
+   retrieveStorage()
+      .then(() => {
+         showView(homeView, false);
 
-   showView(homeView, false);
-
-   //fetch data from API to populate Home view on page load
-
-   logo.addEventListener('click', () => {
-      showView(homeView, false);
-   });
-
-   searchButton.addEventListener('click', () => {
-      showView(searchView, false);
-   });
-
-   playlistButton.addEventListener('click', () => {
-      showView(searchView, true);
-   });
-
-   creditsButton.addEventListener('mouseover', (event) => {
-      const creditsContent = '<p>Group Members: Kellen Caron, Mica Leviste</p><a href="https://github.com/KLCaron/Assignment-2">GitHub</a>';
-      tooltipDisplay(event, creditsContent);
-   });
+         //fetch data from API to populate Home view on page load
+      
+         logo.addEventListener('click', () => {
+            showView(homeView, false);
+         });
+      
+         searchButton.addEventListener('click', () => {
+            showView(searchView, false);
+         });
+      
+         playlistButton.addEventListener('click', () => {
+            showView(searchView, true);
+         });
+      
+         creditsButton.addEventListener('mouseover', (event) => {
+            const creditsContent = '<p>Group Members: Kellen Caron, Mica Leviste</p><a href="https://github.com/KLCaron/Assignment-2">GitHub</a>';
+            tooltipDisplay(event, creditsContent);
+         });
+      })
+      .catch((error) => {
+         console.error('Error retrieving stored data: ', error);
+      });
 });
-
-async function initialize() {
-   try {
-      await retrieveStorage();
-   } catch (error) {
-      console.error('Error retrieving stored data: ', error);
-   }
-}
 
 function setSongSearch() {
    const titleRadio = document.querySelector('#titleRadio');
@@ -97,48 +93,52 @@ function showSearchView(redirect) {
    const playlistStats = document.querySelector('#playlistStats');
    const searchResultsHeader = document.querySelector('#searchResultsHeader');
 
-   initialize();
+   retrieveStorage()
+      .then(() => {
+         let mySongs;
 
-   let mySongs;
-
-   if (redirect) {
-      searchResultsHeader.innerHTML = 'Playlist';
-      mySongs = setPlaylistSongs(songs);
-      clearPlaylistButton.style.display = 'block';
-      clearPlaylistButton.addEventListener('click', () => {
-         clearPlaylist();
-         showSearchView(redirect);
-         showSnackbar();
+         if (redirect) {
+            searchResultsHeader.innerHTML = 'Playlist';
+            mySongs = setPlaylistSongs(songs);
+            clearPlaylistButton.style.display = 'block';
+            clearPlaylistButton.addEventListener('click', () => {
+               clearPlaylist();
+               showSearchView(redirect);
+               showSnackbar();
+            });
+            playlistStats.style.display = 'block';
+            showplaylistStats();
+         } else {
+            searchResultsHeader.innerHTML = 'Search Results';
+            mySongs = songs;
+            clearPlaylistButton.style.display = 'none';
+            playlistStats.style.display = 'none';
+         }
+      
+         mySongs.sort((a, b) => a.title.localeCompare(b.title));
+         const songList = document.querySelector('#songList');
+         arraySongs(mySongs, displaySongList(mySongs, songList, redirect), redirect);
+      
+         filterButton.addEventListener('click', () => {
+            const selectedFilter = document.querySelector(`input[name="filter"]:checked`).value;
+            const filterInput = document.querySelector(`#${selectedFilter}Filter`);
+            const inputValue = filterInput.value.trim();
+            filterSongs(inputValue, mySongs, songList, selectedFilter, redirect);
+         });
+      
+         clearButton.addEventListener('click', () => {
+            clearSongsFilter(mySongs, songList, redirect);
+         });
+      })
+      .catch((error) => {
+         console.error('Error retrieving stored data: ', error);
       });
-      playlistStats.style.display = 'block';
-      showplaylistStats();
-   } else {
-      searchResultsHeader.innerHTML = 'Search Results';
-      mySongs = songs;
-      clearPlaylistButton.style.display = 'none';
-      playlistStats.style.display = 'none';
-   }
-
-   mySongs.sort((a, b) => a.title.localeCompare(b.title));
-   const songList = document.querySelector('#songList');
-   arraySongs(mySongs, displaySongList(mySongs, songList, redirect), redirect);
-
-   filterButton.addEventListener('click', () => {
-      const selectedFilter = document.querySelector(`input[name="filter"]:checked`).value;
-      const filterInput = document.querySelector(`#${selectedFilter}Filter`);
-      const inputValue = filterInput.value.trim();
-      filterSongs(inputValue, mySongs, songList, selectedFilter, redirect);
-   });
-
-   clearButton.addEventListener('click', () => {
-      clearSongsFilter(mySongs, songList, redirect);
-   });
 }
 
 //fetch and store song data from our jsons
 function fetchStoreData() {
    const api = 'https://www.randyconnolly.com/funwebdev/3rd/api/music/songs-nested.php';
-   fetch('artists.json')
+   const fetchArtists = fetch('artists.json')
       .then(response => response.json())
       .then(data => {
          artists = data;
@@ -146,7 +146,7 @@ function fetchStoreData() {
       })
       .catch(error => console.error('Error fetching artists.json:', error));
 
-   fetch('genres.json')
+   const fetchGenres = fetch('genres.json')
       .then(response => response.json())
       .then(data => {
          genres = data;
@@ -154,13 +154,15 @@ function fetchStoreData() {
       })
       .catch(error => console.error('Error fetching genres.json', error));
 
-   fetch(api) //'api' goes here when done
+   const fetchSongs = fetch(api) //'api' goes here when done
       .then(response => response.json())
       .then(data => {
          songs = data;
          localStorage.setItem('songs', JSON.stringify(data));
       })
       .catch(error => console.error('Error fetching artists.json', error));
+
+   return Promise.all([fetchArtists, fetchGenres, fetchSongs]);
 }
 
 //retrive data from local storage
@@ -174,10 +176,16 @@ function retrieveStorage() {
          artists = JSON.parse(localArtists);
          genres = JSON.parse(localGenres);
          songs = JSON.parse(localSongs);
+         resolve();
       } else {
-         fetchStoreData();
+         fetchStoreData()
+            .then(() => {
+               resolve();
+            })
+            .catch((error) => {
+               reject(error);
+            });
       }
-      resolve();
    });
 }
 
@@ -615,12 +623,15 @@ function showplaylistStats() {
 /******************************************************************************************************************************************/
 
 function showHomeView() {
-   initialize();
-
-   topOf(genres); //need to make links
-   topOf(artists); //need to make links
-   topOf(songs); //need to make links
-
+   retrieveStorage()
+      .then(() => {
+         topOf(genres);
+         topOf(artists);
+         topOf(songs);
+      })
+      .catch((error) => {
+         console.error('Error retrieving stored data: ', error);
+      });
 }
 
 function topOf(selection) {
