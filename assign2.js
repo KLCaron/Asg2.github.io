@@ -94,6 +94,7 @@ function showSearchView(redirect) {
    const filterButton = document.querySelector('#filterButton');
    const clearButton = document.querySelector('#clearButton');
    const clearPlaylistButton = document.querySelector('#clearPlaylistButton');
+   const playlistStats = document.querySelector('#playlistStats');
 
    retrieveStorage();
 
@@ -107,9 +108,12 @@ function showSearchView(redirect) {
          showSearchView(redirect);
          showSnackbar();
       });
+      playlistStats.style.display = 'block';
+      showplaylistStats();
    } else {
       mySongs = songs;
       clearPlaylistButton.style.display = 'none';
+      playlistStats.style.display = 'none';
    }
 
    mySongs.sort((a, b) => a.title.localeCompare(b.title));
@@ -556,5 +560,36 @@ function clearPlaylist() {
    localStorage.setItem('songs', JSON.stringify(songs));
 }
 
-//still need to finish playlist - need a way to clear playlist, and then summary information about the playlist, like average popularity, or number of songs
-//in list
+function showplaylistStats() {
+   const content = document.querySelector('#playlistStatsContent');
+   content.innerHTML = '';
+   const songNumItem = document.createElement('li');
+   const avgPopItem = document.createElement('li');
+   songNumItem.classList.add('playlistItem');
+   avgPopItem.classList.add('playlistItem');
+   let avgPop = 0;
+   let songNum = 0;
+
+   songs.forEach (song => {
+      if (song.onPlaylist) {
+         songNum++;
+         avgPop += song.details.popularity;
+      }
+   });
+
+   if (avgPop != 0) {
+      avgPop /= songNum;
+      avgPop = avgPop.toFixed(1);
+      avgPop = parseFloat(avgPop).toString();
+   }
+
+   songNumItem.innerHTML = `# of Songs in Playlist: ${songNum}`;
+   avgPopItem.innerHTML = `Average Popularity of Playlist Songs: ${avgPop}`;
+
+   content.appendChild(songNumItem);
+   content.appendChild(avgPopItem);
+}
+
+//make new js docs at the end lmao
+/******************************************************************************************************************************************/
+

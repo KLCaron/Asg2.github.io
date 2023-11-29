@@ -155,4 +155,8 @@ li.headerRow > span.sortable.up > .sortIndicator {
     display: block;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
- }
+}
+
+.playlistItem {
+    list-style-type: none;
+}
