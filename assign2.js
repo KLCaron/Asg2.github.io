@@ -1,10 +1,3 @@
-const api = 'https://www.randyconnolly.com/funwebdev/3rd/api/music/songs-nested.php';
-/* note: you may get a CORS error if you try fetching this locally (i.e., directly from a
-   local file). To work correctly, this needs to be tested on a local web server.  
-   Some possibilities: if using Visual Code, use Live Server extension; if Brackets,
-   use built-in Live Preview.
-*/
-
 document.addEventListener('DOMContentLoaded', () => {
    //get references to my various elements
    const searchButton = document.querySelector('#searchButton');
@@ -14,12 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
    const searchView = document.querySelector('#searchView');
    const logo = document.querySelector('#logo');
 
+   retrieveStorage();
+
    showView(homeView, false);
 
    //fetch data from API to populate Home view on page load
-   window.addEventListener('load', () => {
-      retrieveStorage();
-   });
 
    logo.addEventListener('click', () => {
       showView(homeView, false);
@@ -83,8 +75,8 @@ function showView(view, redirect) {
       showSearchView(redirect);
       setSongSearch();
    } else if (view == homeView) {
-      view.style.display = 'none';
-   } else if (redirect) {
+      showHomeView();
+   } else {
       showSearchView(redirect);
       setSongSearch();
    }
@@ -95,12 +87,14 @@ function showSearchView(redirect) {
    const clearButton = document.querySelector('#clearButton');
    const clearPlaylistButton = document.querySelector('#clearPlaylistButton');
    const playlistStats = document.querySelector('#playlistStats');
+   const searchResultsHeader = document.querySelector('#searchResultsHeader');
 
    retrieveStorage();
 
    let mySongs;
 
    if (redirect) {
+      searchResultsHeader.innerHTML = 'Playlist';
       mySongs = setPlaylistSongs(songs);
       clearPlaylistButton.style.display = 'block';
       clearPlaylistButton.addEventListener('click', () => {
@@ -111,6 +105,7 @@ function showSearchView(redirect) {
       playlistStats.style.display = 'block';
       showplaylistStats();
    } else {
+      searchResultsHeader.innerHTML = 'Search Results';
       mySongs = songs;
       clearPlaylistButton.style.display = 'none';
       playlistStats.style.display = 'none';
@@ -134,6 +129,7 @@ function showSearchView(redirect) {
 
 //fetch and store song data from our jsons
 function fetchStoreData() {
+   const api = 'https://www.randyconnolly.com/funwebdev/3rd/api/music/songs-nested.php';
    fetch('artists.json')
       .then(response => response.json())
       .then(data => {
@@ -150,7 +146,7 @@ function fetchStoreData() {
       })
       .catch(error => console.error('Error fetching genres.json', error));
 
-   fetch('sample-songs.json') //'api' goes here when done
+   fetch(api) //'api' goes here when done
       .then(response => response.json())
       .then(data => {
          songs = data;
@@ -374,6 +370,12 @@ function filterSongs(inputValue, songs, songList, selectedFilter, redirect) {
 }
 
 function clearSongsFilter(songs, songList, redirect) {
+   const titleInput = document.querySelector('#titleFilter');
+   const genreInput = document.querySelector('#genreFilter');
+   const artistInput = document.querySelector('#artistFilter');
+   titleInput.value = '';
+   genreInput.value = '';
+   artistInput.value = '';
    arraySongs(songs, displaySongList(songs, songList), redirect);
 }
 
@@ -593,3 +595,95 @@ function showplaylistStats() {
 //make new js docs at the end lmao
 /******************************************************************************************************************************************/
 
+function showHomeView() {
+   retrieveStorage();
+
+   topOf(genres); //need to make links
+   topOf(artists); //need to make links
+   topOf(songs); //need to make links
+
+}
+
+function topOf(selection) {
+   const searchView = document.querySelector('#searchView');
+   const counts = numbersOf(selection);
+   const filterButton = document.querySelector('#filterButton');
+   const titleFilter = document.querySelector('#titleFilter');
+   let topList;
+   let source;
+   let inputField;
+   let inputRadio;
+
+   if (selection == genres) {
+      topList = document.querySelector(`#topGenresList`);
+      inputField = document.querySelector('#genreFilter');
+      inputRadio = document.querySelector('#genreRadio');
+      source = 'genres';
+   } else if (selection == artists) {
+      topList = document.querySelector(`#topArtistsList`);
+      inputField = document.querySelector('#artistFilter');
+      inputRadio = document.querySelector('#artistRadio');
+      source = 'artists';
+   } else {
+      topList = document.querySelector('#mostPopularSongsList')
+      source = 'songs'
+   }
+
+   topList.innerHTML = '';
+
+   const countArray = Object.entries(counts).map(([name, count]) => ({name, count}));
+   countArray.sort((a, b) => b.count - a.count);
+
+   const top15 = countArray.slice(0, 15);
+   let matchingName;
+   
+   top15.forEach(entry => {
+      const listItem = document.createElement('li');
+      listItem.classList.add('topItem', 'selectable');
+      listItem.textContent = entry.name;
+      listItem.addEventListener('click', () => {
+         if (source == 'songs') {
+            matchingName = selection.find(song => song.title == entry.name);
+            showSingleSongView(matchingName);
+         } else {
+            showView(searchView, false);
+            inputField.disabled = false;
+            titleFilter.disabled = true;
+            inputField.value = entry.name;
+            inputRadio.checked = true;
+            filterButton.click();
+         }
+      });
+      topList.appendChild(listItem);
+   })
+}
+
+function numbersOf(selection) {
+   const counts = {};
+   let selectedName;
+
+   if (selection == songs) {
+      selection.forEach (selected => {
+         counts[selected.title] = selected.details.popularity;
+      });
+
+      return counts;
+   }
+
+   selection.forEach (selected => {
+      counts[selected.name] = 0;
+   });   
+
+   songs.forEach(song => {
+      if (selection == genres) {
+         selectedName = song.genre.name;
+      } else {
+         selectedName = song.artist.name;
+      }
+      if (counts.hasOwnProperty(selectedName)) {
+         counts[selectedName]++;
+      }
+   });
+
+   return counts;
+}

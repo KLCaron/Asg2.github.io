@@ -8,11 +8,16 @@
 .tooltip {
     position: fixed;
     z-index: 999;
-    background-color: gray;
+    background-color: rgba(128, 128, 128, 0.8);
     color: white;
     padding: 5px;
     border-radius: 5px;
     display: none;
+}
+
+.view {
+    display: flex;
+    width: 100%;
 }
 
 .snackbar {
@@ -34,17 +39,13 @@ header {
     margin: 0 20%;
 }
 
-.nav-buttons {
-    margin-left: auto;
-}
-
 .sectionHeader {
     display: flex;
     justify-content: center;
 }
 
 #searchResults, #chart {
-    width: 75%;
+    width: 70%;
     float: right;
 }
 
@@ -76,10 +77,10 @@ header {
 }
 
 .searchButtons {
-    width: 35%;
+    width: 30%;
 }
 
-.songs {
+.songs, .topItem {
     list-style-type: none;
     padding: 0;
 }
@@ -159,4 +160,17 @@ li.headerRow > span.sortable.up > .sortIndicator {
 
 .playlistItem {
     list-style-type: none;
+}
+
+.homeContainer {
+    width: 25%;
+    float: left;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    align-items: center;
+}
+
+#mostPopularSongs {
+    width: 50%;
 }
