@@ -1,3 +1,29 @@
+/* font face for Sohne-Bold */
+@import url('https://fonts.googleapis.com/css2?family=Inter&family=Martel+Sans:wght@300&display=swap');
+
+:root {
+    --color-white: rgba(255,255,255); 
+    --color-aqua-bg : rgb(44,162,163);
+    --color-blue-bg: rgba(63,94,251);
+    --color-puprle-bg: rgba(49,20,59,1);
+    --color-white-200: rgba(251,255,254,0.15);
+}
+
+html {
+    height: 100%;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    background: rgb(63,94,251);
+    background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
+    background-attachment: fixed; 
+    color: var(--color-white);
+    padding: 10px;
+}
+
+.mainContent {
+    padding: 10px;
+}
+
 .selectable {
     cursor: pointer;
 }
@@ -15,12 +41,6 @@
     display: none;
 }
 
-.view {
-    display: none;
-    width: 100%;
-    
-}
-
 .snackbar {
     position: fixed;
     bottom: 20px;
@@ -33,11 +53,64 @@
     display: none;
 }
 
+/* Styles for header */
 header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 0 20%;
+    margin: 0px 10px;
+}
+
+#header-logo {
+    display: flex;
+    align-items: center;
+}
+
+nav {
+    display: flex;
+    gap: 10px; /* Adjust the gap between buttons */
+}
+
+#icon {
+    height: 50px; 
+    margin-right: 5px;
+}
+
+nav button {
+    padding: 10px 15px;
+    background-color: var(--color-white-200);
+    color: var(--color-white-100);
+    border-style: none;
+    border-radius: 7px;
+    font-size: 16px;
+}
+
+nav button:hover {
+    background-color: var(--color-blue-bg);
+}
+
+header h1:hover {
+    color: var(--color-blue-bg);
+}
+
+/* Main content */
+/* home page styles */
+#homeView {
+    display: inline-block;
+    justify-content: center;
+    gap: 20px; 
+    padding: 20px;/
+}
+
+.homeContainer {
+    text-align: center;
+    background-color: var(--color-white-200);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px;
+
+    text-align: center;
+    
 }
 
 .sectionHeader {
@@ -45,9 +118,10 @@ header {
     justify-content: center;
 }
 
+
 #searchResults, #chart {
     width: 70%;
-    float: right;
+    float: left;
 }
 
 #searchOptions, #songInformation {
@@ -161,17 +235,4 @@ li.headerRow > span.sortable.up > .sortIndicator {
 
 .playlistItem {
     list-style-type: none;
-}
-
-.homeContainer {
-    width: 25%;
-    float: left;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    align-items: center;
-}
-
-#mostPopularSongs {
-    width: 50%;
 }

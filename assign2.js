@@ -73,7 +73,7 @@ function showView(view, redirect) {
       view.style.display = 'none';
    });
 
-   view.style.display = 'block';
+   view.style.display = 'flex';
 
    if (view == searchView) {
       showSearchView(redirect);
