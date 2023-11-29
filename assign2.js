@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
    const searchView = document.querySelector('#searchView');
    const logo = document.querySelector('#logo');
 
-   retrieveStorage();
+   initialize();
 
    showView(homeView, false);
 
@@ -30,6 +30,14 @@ document.addEventListener('DOMContentLoaded', () => {
       tooltipDisplay(event, creditsContent);
    });
 });
+
+async function initialize() {
+   try {
+      await retrieveStorage();
+   } catch (error) {
+      console.error('Error retrieving stored data: ', error);
+   }
+}
 
 function setSongSearch() {
    const titleRadio = document.querySelector('#titleRadio');
@@ -89,7 +97,7 @@ function showSearchView(redirect) {
    const playlistStats = document.querySelector('#playlistStats');
    const searchResultsHeader = document.querySelector('#searchResultsHeader');
 
-   retrieveStorage();
+   initialize();
 
    let mySongs;
 
@@ -113,7 +121,7 @@ function showSearchView(redirect) {
 
    mySongs.sort((a, b) => a.title.localeCompare(b.title));
    const songList = document.querySelector('#songList');
-   arraySongs(mySongs, displaySongList(mySongs, songList), redirect);
+   arraySongs(mySongs, displaySongList(mySongs, songList, redirect), redirect);
 
    filterButton.addEventListener('click', () => {
       const selectedFilter = document.querySelector(`input[name="filter"]:checked`).value;
@@ -157,20 +165,23 @@ function fetchStoreData() {
 
 //retrive data from local storage
 function retrieveStorage() {
-   const localArtists = localStorage.getItem('artists');
-   const localGenres = localStorage.getItem('genres');
-   const localSongs = localStorage.getItem('songs');
+   return new Promise((resolve, reject) => {
+      const localArtists = localStorage.getItem('artists');
+      const localGenres = localStorage.getItem('genres');
+      const localSongs = localStorage.getItem('songs');
 
-   if (localArtists && localGenres && localSongs) {
-      artists = JSON.parse(localArtists);
-      genres = JSON.parse(localGenres);
-      songs = JSON.parse(localSongs);
-   } else {
-      fetchStoreData();
-   }
+      if (localArtists && localGenres && localSongs) {
+         artists = JSON.parse(localArtists);
+         genres = JSON.parse(localGenres);
+         songs = JSON.parse(localSongs);
+      } else {
+         fetchStoreData();
+      }
+      resolve();
+   });
 }
 
-function displaySongList(songs, songList) {
+function displaySongList(songs, songList, redirect) {
    songList.innerHTML = '';
 
    const headerRow = document.createElement('li');
@@ -188,7 +199,7 @@ function displaySongList(songs, songList) {
       headerItem.setAttribute('dataDirection', 0);
       headerRow.appendChild(headerItem);
       headerItem.addEventListener('click', (event) => {
-         sortSongs(songs, event, songList);
+         sortSongs(songs, event, songList, redirect);
       });
    });
 
@@ -261,7 +272,7 @@ function arraySongs(songs, songList, redirect) {
    });
 }
 
-function sortSongs(songs, event, songList) {
+function sortSongs(songs, event, songList, redirect) {
    const column = event.target.textContent;
    const direction = parseInt(event.target.getAttribute('dataDirection'));
    let sortingFunction;
@@ -366,17 +377,26 @@ function filterSongs(inputValue, songs, songList, selectedFilter, redirect) {
       return filterValue.includes(inputValue.toLowerCase());
    });
 
-   arraySongs(filteredSongs, displaySongList(filteredSongs, songList), redirect);
+   arraySongs(filteredSongs, displaySongList(filteredSongs, songList, redirect), redirect);
 }
 
 function clearSongsFilter(songs, songList, redirect) {
    const titleInput = document.querySelector('#titleFilter');
    const genreInput = document.querySelector('#genreFilter');
    const artistInput = document.querySelector('#artistFilter');
+   let refreshButton;
+
+   if (redirect) {
+      refreshButton = document.querySelector('#playlistButton');
+   } else {
+      refreshButton = document.querySelector('#searchButton');
+   }
+   
    titleInput.value = '';
    genreInput.value = '';
    artistInput.value = '';
-   arraySongs(songs, displaySongList(songs, songList), redirect);
+   arraySongs(songs, displaySongList(songs, songList, redirect), redirect);
+   refreshButton.click();
 }
 
 function updateSortIndicator(target) {
@@ -389,7 +409,6 @@ function updateSortIndicator(target) {
    } else {
       target.classList.add('down');
    }
-   console.log(target.classList);
 }
 
 //make new js docs at the end lmao
@@ -596,7 +615,7 @@ function showplaylistStats() {
 /******************************************************************************************************************************************/
 
 function showHomeView() {
-   retrieveStorage();
+   initialize();
 
    topOf(genres); //need to make links
    topOf(artists); //need to make links
