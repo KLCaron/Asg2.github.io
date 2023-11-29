@@ -251,6 +251,35 @@ li.headerRow > span.sortable.up > .sortIndicator {
     list-style-type: none;
 }
 
+/*  */
+.left-div { width: 30%; }
+
+.right-div { width: 70%; }
+
+.left-div, .right-div {
+    display:flex;
+    background-color: var(--color-white-200);
+    border-style: none;
+    border-radius: 7px;
+    padding: 15px;
+    gap: 10px;
+}
+
+/* Single Song View Page Styles */
+
+#singleSongView .right-div{
+    padding: 5px;
+    justify-content: center;
+    text-align: center;
+    padding-left: 20px;
+    max-width: 900px;
+}
+
+#singleSongView .left-div, #singleSongView .right-div {
+    margin: 20px;
+}
+
+
 footer {
     font-size: 12px;
     position: fixed;
