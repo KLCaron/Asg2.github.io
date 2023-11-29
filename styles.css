@@ -7,6 +7,7 @@
 
     --color-aqua-bg : rgb(44,162,163);
     --color-blue-bg: rgba(63,94,251);
+    --color-dark-blue: #3d4c99;
     --color-dark-pink: #ff4d9a;
     
 }
@@ -88,11 +89,11 @@ nav button {
 }
 
 nav button:hover {
-    background-color: var(--color-blue-bg);
+    background-color: var(--color-dark-blue);
 }
 
 header h1:hover {
-    color: var(--color-blue-bg);
+    color: var(--color-dark-blue);
 }
 
 /* Main content */
@@ -124,8 +125,12 @@ header h1:hover {
     padding: 3px;
 }
 
+#searchView li:hover {
+    background-color: var(--color-dark-pink);
+}
+
 #homeView li:hover {
-    color: var(--color-blue-bg);
+    color: var(--color-dark-blue)
 }
 
 #searchResults, #chart {
@@ -244,4 +249,15 @@ li.headerRow > span.sortable.up > .sortIndicator {
 
 .playlistItem {
     list-style-type: none;
+}
+
+footer {
+    font-size: 12px;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--color-dark-pink);
+    color: var(--color-white-100);
+    margin-bottom: -5px;
 }
