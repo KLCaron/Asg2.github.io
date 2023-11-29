@@ -498,7 +498,13 @@ function createRadarChart(song) {
          data: [song.analytics.energy, song.analytics.danceability, 
          song.analytics.valence, song.analytics.liveness, song.analytics.acousticness, 
          song.analytics.speechiness],
-         borderColor: 'black',
+         fill: true,
+         backgroundColor: 'rgba(233,133,177, 0.5)',
+         borderColor: 'rgb(233,133,177)',
+         pointBackgroundColor: 'rgb(233,133,177)',
+         pointBorderColor: 'rgb(233,133,177)',
+         pointHoverBackgroundColor: 'rgb(251,255,254)',
+         pointHoverBorderColor: 'rgb(233,133,177)',
          borderWidth: 1
       }]
    };
@@ -506,8 +512,21 @@ function createRadarChart(song) {
    const chartOptions = {
       maintainAspectRatio: false,
       aspectRatio: 0.5,
-      scale: {
+      scales: {
+         r: {
+            angleLines: {
+              color: 'rgb(251,255,254)'
+            },
+            grid: {
+              color: 'rgb(251,255,254)'
+            },
+            pointLabels: {
+              color: 'rgb(251,255,254)'
+            },
+         },
          ticks: {
+            color: 'rgb(29, 17, 40)',
+            backdropColor: 'rgb(251,255,254, 0.2)',
             beginAtZero: true,
             min: 0,
             max: 100,
@@ -520,12 +539,19 @@ function createRadarChart(song) {
       },
       scales: {
          r: {
+            angleLines: {
+               color: 'rgb(251,255,254)'
+             },
+             grid: {
+               color: 'rgb(251,255,254)'
+             },
             ticks: {
                callback: function(value, index, ticks) {
                   return value + '%';
                },
             },
             pointLabels: {
+               color: 'rgb(251,255,254)',
                font: {
                   weight: 'bold',
                   size: 20,
