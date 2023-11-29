@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
    });
 
    creditsButton.addEventListener('mouseover', (event) => {
-      const creditsContent = '<p>Group Members: Kellen Caron</p><a href="https://github.com/">GitHub</a>'; //replace github link here for final handin
+      const creditsContent = '<p>Group Members: Kellen Caron, Mica Leviste</p><a href="https://github.com/KLCaron/Assignment-2">GitHub</a>';
       tooltipDisplay(event, creditsContent);
    });
 });
