@@ -1,5 +1,6 @@
+//wait for DOMContent to load before we do anything
 document.addEventListener('DOMContentLoaded', () => {
-   //get references to my various elements
+
    const searchButton = document.querySelector('#searchButton');
    const playlistButton = document.querySelector('#playlistButton');
    const creditsButton = document.querySelector('#creditsButton');
@@ -7,11 +8,17 @@ document.addEventListener('DOMContentLoaded', () => {
    const searchView = document.querySelector('#searchView');
    const logo = document.querySelector('#logo');
 
+   /*
+   * check storage for json content, if it isn't there we fetch it; after,
+   * we launch our initiall view, and set attach event listeners to our 
+   * selectable buttons/logo. True or false here is for our playlist flag;
+   * our search and playlist view are the same view, with minor differences
+   * determined by the flag.
+   */
    retrieveStorage()
       .then(() => {
-         showView(homeView, false);
 
-         //fetch data from API to populate Home view on page load
+         showView(homeView, false);
       
          logo.addEventListener('click', () => {
             showView(homeView, false);
@@ -35,6 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 });
 
+/*
+* Initializes and sets to default our various song searching filters.
+*/
 function setSongSearch() {
    const titleRadio = document.querySelector('#titleRadio');
    const titleFilter = document.querySelector('#titleFilter');
@@ -65,9 +75,11 @@ function setSongSearch() {
    });
 }
 
-//switch views here
+/*
+* Hides existing view and swaps to passed in view.
+*/
 function showView(view, redirect) {
-   //hide all views
+
    const views = document.querySelectorAll('.view');
    views.forEach(view => {
       view.style.display = 'none';
@@ -76,17 +88,20 @@ function showView(view, redirect) {
    view.style.display = 'flex';
 
    if (view == searchView) {
-      showSearchView(redirect);
+      showSearchOrPlaylistView(redirect);
       setSongSearch();
    } else if (view == homeView) {
       showHomeView();
    } else {
-      showSearchView(redirect);
+      showSearchOrPlaylistView(redirect);
       setSongSearch();
    }
 }
-
-function showSearchView(redirect) {
+/*
+* Initializes and sets up our search and playlist views; the view in question is
+* determined by the redirect flag - false for search, true for playlist.
+*/
+function showSearchOrPlaylistView(redirect) {
    const filterButton = document.querySelector('#filterButton');
    const clearButton = document.querySelector('#clearButton');
    const clearPlaylistButton = document.querySelector('#clearPlaylistButton');
@@ -103,7 +118,7 @@ function showSearchView(redirect) {
             clearPlaylistButton.style.display = 'block';
             clearPlaylistButton.addEventListener('click', () => {
                clearPlaylist();
-               showSearchView(redirect);
+               showSearchOrPlaylistView(redirect);
                showSnackbar();
             });
             playlistStats.style.display = 'block';
@@ -117,7 +132,7 @@ function showSearchView(redirect) {
       
          mySongs.sort((a, b) => a.title.localeCompare(b.title));
          const songList = document.querySelector('#songList');
-         arraySongs(mySongs, displaySongList(mySongs, songList, redirect), redirect);
+         displaySongList(mySongs, displaySongListTitles(mySongs, songList, redirect), redirect);
       
          filterButton.addEventListener('click', () => {
             const selectedFilter = document.querySelector(`input[name="filter"]:checked`).value;
@@ -135,7 +150,10 @@ function showSearchView(redirect) {
       });
 }
 
-//fetch and store song data from our jsons
+/*
+* fetch and store song data from our jsons/api. Returns a promise to retrieveStorage,
+* to ensure full and proper completion before anything else can occur.
+*/
 function fetchStoreData() {
    const api = 'https://www.randyconnolly.com/funwebdev/3rd/api/music/songs-nested.php';
    const fetchArtists = fetch('artists.json')
@@ -154,7 +172,7 @@ function fetchStoreData() {
       })
       .catch(error => console.error('Error fetching genres.json', error));
 
-   const fetchSongs = fetch(api) //'api' goes here when done
+   const fetchSongs = fetch(api)
       .then(response => response.json())
       .then(data => {
          songs = data;
@@ -165,7 +183,10 @@ function fetchStoreData() {
    return Promise.all([fetchArtists, fetchGenres, fetchSongs]);
 }
 
-//retrive data from local storage
+/*
+* Retrive data from local storage; if it isn't there, we fetch it fromm our api
+* and jsons.
+*/
 function retrieveStorage() {
    return new Promise((resolve, reject) => {
       const localArtists = localStorage.getItem('artists');
@@ -189,7 +210,11 @@ function retrieveStorage() {
    });
 }
 
-function displaySongList(songs, songList, redirect) {
+/*
+* For search and playlist view, this creates the header row for our ul table,
+* and attaches the appropriate sorting indicators and event listeners.
+*/
+function displaySongListTitles(songs, songList, redirect) {
    songList.innerHTML = '';
 
    const headerRow = document.createElement('li');
@@ -215,7 +240,11 @@ function displaySongList(songs, songList, redirect) {
    return songList;
 }
 
-function arraySongs(songs, songList, redirect) {
+/*
+* For search and playlist view, creates li items that contain all of our songs.
+* takes in the songlist first made in displaySongListTitles and attaches to it.
+*/
+function displaySongList(songs, songList, redirect) {
    const existingSongItems = songList.querySelectorAll('.songItem');
    existingSongItems.forEach(item => item.remove());
 
@@ -229,13 +258,13 @@ function arraySongs(songs, songList, redirect) {
          playlist.textContent = 'Remove';
          playlist.addEventListener('click', () => {
             removeFromPlaylist(song);
-            showSearchView(redirect);
+            showSearchOrPlaylistView(redirect);
          });
       } else {
          playlist.textContent = 'Add';
          playlist.addEventListener('click', () => {
             addToPlaylist(song);
-            showSearchView(redirect);
+            showSearchOrPlaylistView(redirect);
          });
       }
 
@@ -280,6 +309,10 @@ function arraySongs(songs, songList, redirect) {
    });
 }
 
+/*
+* Sorts our songs along the passed parameter, in standard order and in reverse depending on
+* the dataDirection attribute that was attached to our songListTitles.
+*/
 function sortSongs(songs, event, songList, redirect) {
    const column = event.target.textContent;
    const direction = parseInt(event.target.getAttribute('dataDirection'));
@@ -307,10 +340,13 @@ function sortSongs(songs, event, songList, redirect) {
    updateSortIndicator(event.target);
 
    event.target.setAttribute('dataDirection', direction == 0 ? 1 : 0);
-   arraySongs(songs, songList, redirect);
+   displaySongList(songs, songList, redirect);
 }
 
-//creates a tooltip at the mouse, dynamically positoned based on where in the screen the mouse is
+/*
+* Creates a tooltip at the mouse, dynamically positoned 
+* based on where in the screen the mouse is. Times out after 5 seconds.
+*/
 function tooltipDisplay(event, content) {
    const tooltip = document.querySelector('.tooltip');
    tooltip.innerHTML = content;
@@ -343,6 +379,10 @@ function tooltipDisplay(event, content) {
    }, 5000);
 }
 
+/*
+* shows a snackbar with relevant details on the passed song; was it added, or removed
+* from the playlist, or was the playlist just cleared. Times out after 5 seconds.
+*/
 function showSnackbar(song) {
    const snackbar = document.querySelector('.snackbar');
    snackbar.innerHTML = '';
@@ -368,8 +408,10 @@ function showSnackbar(song) {
    snackbar.setAttribute('timeoutId', timeoutId);
 }
 
-
-
+/*
+* filters through our song list based on the entered title, artist, or genre. Partial
+* entries are accepted and parsed for all fields.
+*/
 function filterSongs(inputValue, songs, songList, selectedFilter, redirect) {
    const filteredSongs = songs.filter(song => {
       let filterValue = '';
@@ -385,9 +427,13 @@ function filterSongs(inputValue, songs, songList, selectedFilter, redirect) {
       return filterValue.includes(inputValue.toLowerCase());
    });
 
-   arraySongs(filteredSongs, displaySongList(filteredSongs, songList, redirect), redirect);
+   displaySongList(filteredSongs, displaySongListTitles(filteredSongs, songList, redirect), redirect);
 }
 
+/*
+* clears all applied filters, both those typed as well as any kind of sorting applied.
+* sets us back to default, the songs/playlist in full, sorted alphabetically by song title.
+*/
 function clearSongsFilter(songs, songList, redirect) {
    const titleInput = document.querySelector('#titleFilter');
    const genreInput = document.querySelector('#genreFilter');
@@ -403,10 +449,14 @@ function clearSongsFilter(songs, songList, redirect) {
    titleInput.value = '';
    genreInput.value = '';
    artistInput.value = '';
-   arraySongs(songs, displaySongList(songs, songList, redirect), redirect);
+   displaySongList(songs, displaySongListTitles(songs, songList, redirect), redirect);
    refreshButton.click();
 }
 
+/*
+* updates the sort indicator next to our list titles, to indicate whether we're sorting
+* positively or negatively.
+*/
 function updateSortIndicator(target) {
    const sortIndicator = parseInt(target.getAttribute('dataDirection'));
 
@@ -419,9 +469,10 @@ function updateSortIndicator(target) {
    }
 }
 
-//make new js docs at the end lmao
-/******************************************************************************************************************************************/
-
+/*
+* Shows our single song view; takes in the selected song, gets the chart set up
+* for it, and loads up the song details.
+*/
 function showSingleSongView(song) {
    const views = document.querySelectorAll('.view');
    views.forEach(view => {
@@ -470,6 +521,10 @@ function showSingleSongView(song) {
    createRadarChart(song);
 }
 
+/*
+* formats the duration of our song; from seconds, into minute:seconds. Adds
+* a leading 0 to seconds when seconds is a single digit.
+*/
 function formatDuration(durationSeconds) {
    const minutes = Math.floor(durationSeconds / 60);
    let seconds = durationSeconds % 60;
@@ -480,11 +535,18 @@ function formatDuration(durationSeconds) {
    return `${minutes}:${seconds}`;
 }
 
+/*
+* get's the given artist's type based on their name, returns unknown if not found.
+*/
 function getArtistType(name) {
    const type = artists.find(artist => artist.name == name);
    return type ? type.type : 'Unknown';
 }
 
+/*
+* create's our radar chart, populated with the given song's detials. The chart
+* is also styled here.
+*/
 function createRadarChart(song) {
    const radarChartCanvas = document.querySelector('#radarChart');
 
@@ -581,21 +643,31 @@ function createRadarChart(song) {
    });
 }
 
-//make new js docs at the end lmao
-/******************************************************************************************************************************************/
-
+/*
+* adds the selected song to our playlist, updates local storage for immediate effect,
+* and shows the appropriate snackbar.
+*/
 function addToPlaylist(song) { 
    song.onPlaylist = true;
    localStorage.setItem('songs', JSON.stringify(songs));
    showSnackbar(song);
 }
 
+/*
+* removes the selected song to our playlist, updates local storage for immediate effect,
+* and shows the appropriate snackbar.
+*/
 function removeFromPlaylist(song) {
    song.onPlaylist = false;
    localStorage.setItem('songs', JSON.stringify(songs));
    showSnackbar(song);
 }
 
+/*
+* called in showSearchOrPlaylistView to create the songs array used for populating our
+* playlist, as opposed to our search. Any song item that was tagged as on the playlist
+* is added.
+*/
 function setPlaylistSongs(songs) {
    let playlistSongs = [];
    songs.forEach (song => {
@@ -607,6 +679,10 @@ function setPlaylistSongs(songs) {
    return playlistSongs;
 }
 
+/*
+* clear's our playlist of all songs, and updates localstorage for immediate
+* effect.
+*/
 function clearPlaylist() {
    songs.forEach (song => {
       song.onPlaylist = false;
@@ -615,6 +691,10 @@ function clearPlaylist() {
    localStorage.setItem('songs', JSON.stringify(songs));
 }
 
+/*
+* calcualtes and presents our playlist stats; how many songs are on the list,
+* and what the average popularity of our lists songs are.
+*/
 function showplaylistStats() {
    const content = document.querySelector('#playlistStatsContent');
    content.innerHTML = '';
@@ -645,9 +725,9 @@ function showplaylistStats() {
    content.appendChild(avgPopItem);
 }
 
-//make new js docs at the end lmao
-/******************************************************************************************************************************************/
-
+/*
+* shows our home view.
+*/
 function showHomeView() {
    retrieveStorage()
       .then(() => {
@@ -660,6 +740,10 @@ function showHomeView() {
       });
 }
 
+/*
+* calculates the top 15 of the passed selection; top 15 genre's, artists, or songs.
+* Also builds the html needed to present these top 15 lists.
+*/
 function topOf(selection) {
    const searchView = document.querySelector('#searchView');
    const counts = numbersOf(selection);
@@ -714,6 +798,11 @@ function topOf(selection) {
    })
 }
 
+/*
+* creates and returns an array that contains a number of key-value pairs, where
+* each key is a genre/artist/song name and the value it is paired with is the number
+* of that selection present in our complete list of songs.
+*/
 function numbersOf(selection) {
    const counts = {};
    let selectedName;
