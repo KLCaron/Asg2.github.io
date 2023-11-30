@@ -4,11 +4,13 @@
 :root {
     --color-white: rgba(255,255,255); 
     --color-white-200: rgba(251,255,254,0.15);
+    --color-dark-gray-200: rgba(37,36,34,1);
 
     --color-aqua-bg : rgb(44,162,163);
     --color-blue-bg: rgba(63,94,251);
     --color-dark-blue: #3d4c99;
     --color-dark-pink: #ff4d9a;
+    --color-purple: #5941A9;
     
 }
 
@@ -35,9 +37,10 @@ html {
     text-decoration: underline;}
 
 .tooltip {
-    position: fixed;
+    position: absolute;
     z-index: 999;
-    background-color: rgba(128, 128, 128, 0.8);
+    /* background-color: rgba(128, 128, 128, 0.8); */
+    background-color: var(--color-purple);
     color: white;
     padding: 5px;
     border-radius: 5px;
@@ -89,11 +92,65 @@ nav button {
 }
 
 nav button:hover {
-    background-color: var(--color-dark-blue);
+    background-color: var(--color-purple);
 }
 
 header h1:hover {
-    color: var(--color-dark-blue);
+    color: var(--color-purple);
+}
+
+/* This is for the credits popup */
+.popup {
+    display: block;
+    padding: 15px;
+    width: 150px;
+}
+
+.popup a {
+    color: var(--color-white);
+    text-decoration: none;
+}
+
+.popup ul {
+    list-style: none;
+}
+
+.popup-content1 {
+    position: relative;
+    padding: 5px;
+}
+  
+/* Position the nested ul alongside the credits popup list */
+.popup-content2{
+    position: absolute;
+    top: 0;
+    right: 100%;
+    display: none; /* Initially hide the nested ul */
+    min-width: 150px;
+    padding: 5px;
+    background-color: var(--color-dark-pink);
+    border-radius: 5px;
+    margin-right: 15px;
+}
+
+/* Show the nested ul when hovering over the credits popup */
+.popup-content1:hover .popup-content2 {
+    display: block;
+    margin-right: 20px;
+    margin-top: 5px;
+}
+
+.popup-content1:hover {
+    background-color: var(--color-white);
+    border-radius: 5px;
+}
+
+.popup-content1:hover a {
+    color: var(--color-purple);
+}
+
+#github-url:hover {
+    text-decoration: underline;
 }
 
 /* Main content */
@@ -121,8 +178,33 @@ header h1:hover {
     justify-content: center;
 }
 
-#homeView li {
+.homeList {
+    list-style: none;
+    text-align: center;
+    justify-content: center;
     padding: 3px;
+    margin: 0px;
+}
+
+.homeList li {
+    padding: 3px;
+}
+
+/* Search View styles */
+#searchView {
+    display: flex;
+}
+
+#searchOptions {
+    flex: 1;
+    padding: 20px;
+}
+
+#searchResults {
+    flex: 2; /* Take up more space */
+    /* Other styles for the right section */
+    /* For example: */
+    padding: 20px;
 }
 
 #searchView li:hover {
@@ -130,7 +212,7 @@ header h1:hover {
 }
 
 #homeView li:hover {
-    color: var(--color-dark-blue)
+    color: var(--color-dark-blue);
 }
 
 #searchResults {
@@ -294,4 +376,6 @@ footer {
     background-color: var(--color-dark-pink);
     color: var(--color-white-100);
     margin-bottom: -5px;
+    padding: 0px 0px 15px 15px;
+    height: 90px;
 }

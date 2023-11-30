@@ -44,10 +44,6 @@
             </div>
         </section>
         <section id="searchView" class="view">
-            <div id="searchResults">
-                <h2 id="searchResultsHeader" class="sectionHeader"></h2>
-                <ul id="songList" class="songs"></ul>
-            </div>
             <div id="searchOptions">
                 <h2 class="sectionHeader">Song Search</h2>
                 <div class="filterContainer">
@@ -75,6 +71,10 @@
                     <ul id="playlistStatsContent"></ul>
                 </div>            
             </div>
+            <div id="searchResults">
+                <h2 id="searchResultsHeader" class="sectionHeader"></h2>
+                <ul id="songList" class="songs"></ul>
+            </div>
         </section>
         <section id="singleSongView" class="view">
             <div id="songInformation" class="left-div">
@@ -85,10 +85,12 @@
         </section>
     </main>
     <footer>
+        <h5>ABOUT</h5>
         <p>
-            ABOUT <br>
-            This is a single-page application that uses Javascript to fetch an API url. This interactive 
-            website allows users to browse songs, add, remove, or clear songs in your playlist, and view song information.
+            This is a single-page application that uses Javascript to fetch data from the local storage or
+            an api url. This interactive website allows users to browse songs; add, remove, or clear songs in your playlist, 
+            and view each song's information. <br>
+            For more information, click on the github url under the credits button.
         </p>
     </footer>
 </body>
