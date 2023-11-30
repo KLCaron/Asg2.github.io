@@ -46,6 +46,7 @@ function showSearchOrPlaylistView(redirect) {
     const clearPlaylistButton = document.querySelector('#clearPlaylistButton');
     const playlistStats = document.querySelector('#playlistStats');
     const searchResultsHeader = document.querySelector('#searchResultsHeader');
+    const titleRadio = document.querySelector('#titleRadio');
  
     retrieveStorage()
        .then(() => {
@@ -74,11 +75,16 @@ function showSearchOrPlaylistView(redirect) {
           displaySongList(mySongs, displaySongListTitles(mySongs, songList, redirect), redirect);
        
           filterButton.addEventListener('click', () => {
-             const selectedFilter = document.querySelector(`input[name="filter"]:checked`).value;
-             const filterInput = document.querySelector(`#${selectedFilter}Filter`);
-             const inputValue = filterInput.value.trim();
-             filterSongs(inputValue, mySongs, songList, selectedFilter, redirect);
+            const selectedFilter = document.querySelector(`input[name="filter"]:checked`).value;
+            const filterInput = document.querySelector(`#${selectedFilter}Filter`);
+            const inputValue = filterInput.value.trim();
+            filterSongs(inputValue, mySongs, songList, selectedFilter, redirect);
           });
+
+          //if we came from homeview, we apply filter immediately
+          if (!titleRadio.checked) {
+            filterButton.click();
+          }
        
           clearButton.addEventListener('click', () => {
              clearSongsFilter(mySongs, songList, redirect);

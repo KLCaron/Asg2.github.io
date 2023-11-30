@@ -25,7 +25,6 @@ function showHomeView() {
  function topOf(selection) {
     const searchView = document.querySelector('#searchView');
     const counts = numbersOf(selection);
-    const filterButton = document.querySelector('#filterButton');
     const titleFilter = document.querySelector('#titleFilter');
     let topList;
     let source;
@@ -69,7 +68,6 @@ function showHomeView() {
              titleFilter.disabled = true;
              inputField.value = entry.name;
              inputRadio.checked = true;
-             filterButton.click();
           }
        });
        topList.appendChild(listItem);
