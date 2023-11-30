@@ -30,24 +30,24 @@ function showSingleSongView(song) {
     const formattedDuration = formatDuration(song.details.duration);
     const artistType = getArtistType(song.artist.name)
     const songDetailsHTML = `
-    <h2>${song.title}</h2>
-    <p>Artist: ${song.artist.name}</p>
-    <p>Artist Type: ${artistType}</p>
-    <p>Genre: ${song.genre.name}</p>
-    <p>Year: ${song.year}</p>
-    <p>Duration: ${formattedDuration}</p>`;
-    const analysisData = `
-    <h3>Analysis Data: </h3>
-    <ul>
-    <li>BPM: ${song.details.bpm}</li>
-    <li>Energy: ${song.analytics.energy}</li>
-    <li>Danceability: ${song.analytics.danceability}</li>
-    <li>Liveness: ${song.analytics.liveness}</li>
-    <li>Valence: ${song.analytics.valence}</li>
-    <li>Acousticness: ${song.analytics.acousticness}</li>
-    <li>Speechiness: ${song.analytics.speechiness}</li>
-    <li>Popularity: ${song.details.popularity}</li>
-    </ul>`;
+      <h2>${song.title}</h2>
+      <p>Artist: ${song.artist.name}</p>
+      <p>Artist Type: ${artistType}</p>
+      <p>Genre: ${song.genre.name}</p>
+      <p>Year: ${song.year}</p>
+      <p>Duration: ${formattedDuration}</p>`;
+      const analysisData = `
+      <h3>Analysis Data: </h3>
+      <ul>
+         <li>BPM: ${song.details.bpm}</li>
+         <li>Energy: ${song.analytics.energy}</li>
+         <li>Danceability: ${song.analytics.danceability}</li>
+         <li>Liveness: ${song.analytics.liveness}</li>
+         <li>Valence: ${song.analytics.valence}</li>
+         <li>Acousticness: ${song.analytics.acousticness}</li>
+         <li>Speechiness: ${song.analytics.speechiness}</li>
+         <li>Popularity: ${song.details.popularity}</li>
+      </ul>`;
  
     songInformation.innerHTML = songDetailsHTML + analysisData;
     radarChartContainer.appendChild(radarChartCanvas);
@@ -95,13 +95,13 @@ function createRadarChart(song) {
           song.analytics.valence, song.analytics.liveness, song.analytics.acousticness, 
           song.analytics.speechiness],
           fill: true,
-          backgroundColor: 'rgba(233,133,177, 0.5)',
-          borderColor: 'rgb(233,133,177)',
-          pointBackgroundColor: 'rgb(233,133,177)',
-          pointBorderColor: 'rgb(233,133,177)',
+          borderWidth: 1,
+          backgroundColor: 'rgba(29, 17, 40, 0.5)',
+          borderColor: 'rgb(29, 17, 40)',
+          pointBackgroundColor: 'rgb(29, 17, 40)',
+          pointBorderColor: 'rgb(29, 17, 40)',
           pointHoverBackgroundColor: 'rgb(251,255,254)',
-          pointHoverBorderColor: 'rgb(233,133,177)',
-          borderWidth: 1
+          pointHoverBorderColor: 'rgb(29, 17, 40)'
        }]
     };
  
