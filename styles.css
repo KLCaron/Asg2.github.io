@@ -11,7 +11,6 @@
     --color-dark-blue: #3d4c99;
     --color-dark-pink: #ff4d9a;
     --color-purple: #5941A9;
-    
 }
 
 html {
@@ -23,6 +22,13 @@ html {
     background-attachment: fixed; 
     color: var(--color-white);
     padding: 10px;
+}
+
+body {
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+    color: var(--color-white-100);
 }
 
 .mainContent {
@@ -103,7 +109,7 @@ header h1:hover {
 .popup {
     display: block;
     padding: 15px;
-    width: 150px;
+    max-width: 150px;
 }
 
 .popup a {
@@ -207,8 +213,12 @@ header h1:hover {
     padding: 20px;
 }
 
-#searchView li:hover {
+/* #searchView li:hover {
     background-color: var(--color-dark-pink);
+} */
+
+.headerTitles:hover {
+    color: var(--color-purple);
 }
 
 #homeView li:hover {
@@ -244,12 +254,20 @@ header h1:hover {
 
 .filterInput {
     flex: 0.9;
+    width: calc(80% - 120px);
 }
 
-#searchButtonContainer {
+/* #searchButtonContainer {
     display: flex;
     justify-content: center;
     gap: 20px;
+} */
+
+.buttonContainer {
+    position: absolute; /* Set position to absolute */
+    top: 0;
+    left: -70px; /* Adjust this value based on the button width */
+    /* Other styles for the button container */
 }
 
 .searchButtons {
@@ -259,10 +277,6 @@ header h1:hover {
 .songs, .topItem {
     list-style-type: none;
     padding: 0;
-}
-
-.filterInput {
-    width: calc(80% - 120px);
 }
 
 .songs .headerRow, .songs .songItem {
@@ -283,11 +297,48 @@ header h1:hover {
     text-align: left;
 }
 
+.songItem {
+    position: relative;
+}
+
+.addButton {
+    border-style: none;
+    border-radius: 5px;
+    height: 25px;
+    width: 50px;
+    margin-right: 20px;
+    background-color: var(--color-dark-pink);
+    color: var(--color-white);
+}
+
+.removeButton {
+    border-style: none;
+    border-radius: 5px;
+    height: 25px;
+    width: 60px;
+    margin-right: 20px;
+    display: block;
+    background-color: var(--color-dark-blue);
+    color: var(--color-white);
+}
+
+.addButton:hover, .removeButton:hover {
+    text-decoration: none;
+    background-color: var(--color-white);
+    color: var(--color-dark-gray-200);
+}
+
+.songTitles, .titleHeader {
+    margin-left: 30px;
+}
+
 /* recheck this once we implement api */
 #songList {
     height: 400px;
     overflow-y: scroll;
     overflow-x: hidden;
+    display: block;
+    padding-right: 75px;;
 }
 
 li.headerRow > span.sortable > .sortIndicator {
@@ -299,11 +350,11 @@ li.headerRow > span.sortable > .sortIndicator {
 }
 
 li.headerRow > span.sortable.down > .sortIndicator {
-    border-bottom: 4px solid red;
+    border-bottom: 5px solid red;
 }
 
 li.headerRow > span.sortable.up > .sortIndicator {
-    border-top: 4px solid green;
+    border-top: 5px solid green;
 }
 
 #songInformation {

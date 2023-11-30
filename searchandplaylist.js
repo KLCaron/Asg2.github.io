@@ -111,8 +111,14 @@ function displaySongListTitles(songs, songList, redirect) {
     const headerTitles = ['Title', 'Artist', 'Year', 'Genre', 'Popularity'];
     headerTitles.forEach(title => {
        const headerItem = document.createElement('span');
+       headerItem.classList.add('headerTitles');
        headerItem.classList.add('sortable');
        headerItem.classList.add('selectable');
+
+       if (title === 'Title') {
+         headerItem.classList.add('titleHeader'); // Add a class specifically for the 'Title' header
+      }
+
        headerItem.innerHTML = `${title}<span class="sortIndicator"></span>`;
        headerItem.setAttribute('dataDirection', 0);
        headerRow.appendChild(headerItem);
@@ -136,25 +142,34 @@ function displaySongList(songs, songList, redirect) {
     songs.forEach(song => {
        const listItem = document.createElement('li');
        listItem.classList.add('songItem');
+
+      // Create the button container
+      const buttonContainer = document.createElement('div');
+      buttonContainer.classList.add('buttonContainer');
  
        const playlist = document.createElement('button');
        playlist.classList.add('selectable');
        if (song.onPlaylist) {
           playlist.textContent = 'Remove';
+          playlist.classList.add('removeButton');
           playlist.addEventListener('click', () => {
              removeFromPlaylist(song);
              showSearchOrPlaylistView(redirect);
           });
        } else {
           playlist.textContent = 'Add';
+          playlist.classList.add('addButton');
           playlist.addEventListener('click', () => {
              addToPlaylist(song);
              showSearchOrPlaylistView(redirect);
           });
        }
+
+       buttonContainer.appendChild(playlist);
  
        const title = document.createElement('span');
        title.classList.add('selectable');
+       title.classList.add('songTitles');
        title.textContent = song.title.length > 25 ? song.title.slice(0, 24) : song.title;
        
        title.addEventListener('click', () => {
@@ -182,7 +197,8 @@ function displaySongList(songs, songList, redirect) {
  
        const popularity = document.createElement('span');
        popularity.textContent = song.details.popularity;
- 
+       
+       buttonContainer.appendChild(playlist);
        listItem.appendChild(playlist);
        listItem.appendChild(title);
        listItem.appendChild(artist);
