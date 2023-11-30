@@ -199,18 +199,23 @@ header h1:hover {
 /* Search View styles */
 #searchView {
     display: flex;
+    gap: 30px;
 }
 
 #searchOptions {
     flex: 1;
-    padding: 20px;
+    padding: 10px;
+    background-color: var(--color-white-200);
+    border-style: none;
+    border-radius: 8px;
 }
 
 #searchResults {
-    flex: 2; /* Take up more space */
-    /* Other styles for the right section */
-    /* For example: */
-    padding: 20px;
+    flex: 2;
+    padding: 10px;
+    background-color: var(--color-white-200);
+    border-style: none;
+    border-radius: 8px;
 }
 
 /* #searchView li:hover {
@@ -257,21 +262,43 @@ header h1:hover {
     width: calc(80% - 120px);
 }
 
-/* #searchButtonContainer {
+#searchButtonContainer {
     display: flex;
     justify-content: center;
     gap: 20px;
-} */
+}
 
 .buttonContainer {
     position: absolute; /* Set position to absolute */
     top: 0;
-    left: -70px; /* Adjust this value based on the button width */
-    /* Other styles for the button container */
+}
+
+[type="radio"] {
+    width: 1.3em;
+    height: 1.3em;
+}
+
+[type="radio"]:checked {
+    width: 1.3em;
+    height: 1.3em;
+    accent-color: var(--color-purple);
 }
 
 .searchButtons {
+    max-width: 70px;
     width: 30%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border-style: none;
+    background-color: var(--color-purple);
+    color: var(--color-white);
+}
+
+.searchButtons:hover {
+    text-decoration: none;
+    background-color: var(--color-white);
+    color: var(--color-dark-gray-200);
 }
 
 .songs, .topItem {
@@ -316,8 +343,7 @@ header h1:hover {
     border-radius: 5px;
     height: 25px;
     width: 60px;
-    margin-right: 20px;
-    display: block;
+    margin-right: 60px;
     background-color: var(--color-dark-blue);
     color: var(--color-white);
 }
@@ -389,7 +415,6 @@ li.headerRow > span.sortable.up > .sortIndicator {
     list-style-type: none;
 }
 
-/*  */
 .left-div { width: 30%; }
 
 .right-div { width: 70%; }
